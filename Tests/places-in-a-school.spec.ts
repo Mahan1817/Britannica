@@ -1,9 +1,16 @@
+
 import { test, expect, Page } from '@playwright/test';
 import 'dotenv/config';
 
-const BASE_URL = process.env.BASE_URL!;
-const EMAIL = process.env.STUDENT_EMAIL!;
-const PASSWORD = process.env.STUDENT_PASSWORD!;
+const BASE_URL = process.env.BASE_URL;
+const EMAIL = process.env.STUDENT_EMAIL;
+const PASSWORD = process.env.STUDENT_PASSWORD;
+
+if (!BASE_URL || !EMAIL || !PASSWORD) {
+  throw new Error(
+    'Missing required environment variables: BASE_URL, STUDENT_EMAIL, STUDENT_PASSWORD'
+  );
+}
 
 test.describe('Student - Places in a School Activity', () => {
   test.setTimeout(120000);
@@ -50,7 +57,7 @@ test.describe('Student - Places in a School Activity', () => {
 
     await page.getByRole('button', { name: 'Sign in' }).click();
 
-    // Navigate to the activity
+    // Navigate to Places in a School
     await expect(
       page.getByRole('button', { name: 'Home Page' })
     ).toBeVisible({ timeout: 20000 });
@@ -71,7 +78,7 @@ test.describe('Student - Places in a School Activity', () => {
     await expect(placesInSchool).toBeVisible({ timeout: 15000 });
     await placesInSchool.click();
 
-    // Start the activity
+    // Start activity
     const letsGoButton = page.getByRole('button', {
       name: "Let's Go",
     });
@@ -83,7 +90,7 @@ test.describe('Student - Places in a School Activity', () => {
       page.getByRole('button', { name: 'Play Sound' })
     ).toBeVisible({ timeout: 15000 });
 
-    // Complete the first set of questions
+    // Complete first set of questions
     await playSound(page);
     await selectAnswer(page, /A library, labeled.*Library/i);
 
@@ -99,7 +106,7 @@ test.describe('Student - Places in a School Activity', () => {
     await playSound(page);
     await selectAnswer(page, /A music room, labeled.*Music/i);
 
-    // Continue to the next set
+    // Continue to remaining questions
     const continueGameButton = page.getByRole('button', {
       name: 'Continue Game',
     });
@@ -107,7 +114,7 @@ test.describe('Student - Places in a School Activity', () => {
     await expect(continueGameButton).toBeVisible({ timeout: 15000 });
     await continueGameButton.click();
 
-    // Complete the remaining questions
+    // Complete remaining questions
     await playSound(page);
     await selectAnswer(page, /A classroom, labeled/i);
 
@@ -129,7 +136,7 @@ test.describe('Student - Places in a School Activity', () => {
       /Nurse['’]s office, labeled/i
     );
 
-    // Verify completion and results
+    // Verify completion and score
     await expect(
       page.getByText("That’s the way!")
     ).toBeVisible({ timeout: 15000 });
@@ -141,8 +148,6 @@ test.describe('Student - Places in a School Activity', () => {
     await expect(resultMessage).toBeVisible({ timeout: 15000 });
 
     const resultText = await resultMessage.innerText();
-    console.log('Result:', resultText);
-
     const scoreMatch = resultText.match(/score of\s*(\d+)/i);
 
     expect(scoreMatch).not.toBeNull();
@@ -153,11 +158,13 @@ test.describe('Student - Places in a School Activity', () => {
 
     expect(score).toBeGreaterThanOrEqual(60);
 
+    // Verify all stars were earned
     await expect(
       page.getByText(/got all the stars/i)
     ).toBeVisible({ timeout: 15000 });
 
-    console.log(`Stars Earned: 3/3`);
-    console.log(`Activity Status: PASSED`);
+    console.log('Stars: All stars earned');
+    console.log('Activity Status: PASSED');
   });
 });
+
