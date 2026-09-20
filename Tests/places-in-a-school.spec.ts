@@ -1,4 +1,3 @@
-
 import { test, expect, Page } from '@playwright/test';
 import 'dotenv/config';
 
@@ -43,27 +42,31 @@ test.describe('Student - Places in a School Activity', () => {
       waitUntil: 'domcontentloaded',
     });
 
-    await expect(
-      page.getByRole('textbox', { name: 'Email or username' })
-    ).toBeVisible();
+    const emailInput = page.getByRole('textbox', {
+      name: 'Email or username',
+    });
 
-    await page
-      .getByRole('textbox', { name: 'Email or username' })
-      .fill(EMAIL);
+    await expect(emailInput).toBeVisible({ timeout: 20000 });
+    await emailInput.fill(EMAIL);
 
-    await page
-      .getByRole('textbox', { name: 'Password' })
-      .fill(PASSWORD);
+    const passwordInput = page.getByRole('textbox', {
+      name: 'Password',
+    });
+
+    await expect(passwordInput).toBeVisible({ timeout: 10000 });
+    await passwordInput.fill(PASSWORD);
 
     await page.getByRole('button', { name: 'Sign in' }).click();
 
+    // Verify successful login
+    const homePageButton = page.getByRole('button', {
+      name: 'Home Page',
+    });
+
+    await expect(homePageButton).toBeVisible({ timeout: 20000 });
+    await homePageButton.click();
+
     // Navigate to Places in a School
-    await expect(
-      page.getByRole('button', { name: 'Home Page' })
-    ).toBeVisible({ timeout: 20000 });
-
-    await page.getByRole('button', { name: 'Home Page' }).click();
-
     const schoolTopicIcon = page
       .locator('path[fill="#FF9F4C"]')
       .first();
@@ -86,9 +89,12 @@ test.describe('Student - Places in a School Activity', () => {
     await expect(letsGoButton).toBeVisible({ timeout: 15000 });
     await letsGoButton.click();
 
-    await expect(
-      page.getByRole('button', { name: 'Play Sound' })
-    ).toBeVisible({ timeout: 15000 });
+    // Verify activity has started
+    const playSoundButton = page.getByRole('button', {
+      name: 'Play Sound',
+    });
+
+    await expect(playSoundButton).toBeVisible({ timeout: 15000 });
 
     // Complete first set of questions
     await playSound(page);
@@ -136,11 +142,12 @@ test.describe('Student - Places in a School Activity', () => {
       /Nurse['’]s office, labeled/i
     );
 
-    // Verify completion and score
+    // Verify completion
     await expect(
       page.getByText("That’s the way!")
     ).toBeVisible({ timeout: 15000 });
 
+    // Verify score
     const resultMessage = page.getByText(
       /WOW, you got a score of/i
     );
@@ -167,4 +174,3 @@ test.describe('Student - Places in a School Activity', () => {
     console.log('Activity Status: PASSED');
   });
 });
-
