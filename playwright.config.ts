@@ -15,9 +15,10 @@ export default defineConfig({
 
   use: {
     baseURL: process.env.BASE_URL,
-    headless:false,
+    headless: true,
+    viewport: null,
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
     video: 'on',
-  }
+  },
 });
