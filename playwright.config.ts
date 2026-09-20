@@ -15,17 +15,9 @@ export default defineConfig({
 
   use: {
     baseURL: process.env.BASE_URL,
-
-    headless: false,
-
-    viewport: null,
-
-    launchOptions: {
-      args: ['--start-maximized'],
-    },
-
+    headless: true,
     screenshot: 'only-on-failure',
-    trace: 'on',
+    trace: 'on-first-retry',
     video: 'on',
-  },
+  }
 });
